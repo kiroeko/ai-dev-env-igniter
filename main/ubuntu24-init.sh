@@ -69,7 +69,7 @@ init() {
     if [ "$is_wsl" = false ]; then
         sudo echo -e "blacklist nouveau\noptions nouveau modeset=0" | sudo tee /etc/modprobe.d/blacklist-nouveau.conf
         sudo update-initramfs -u
-        sudo apt install -y nvidia-driver-570-server
+        sudo apt install -y nvidia-driver-575-server
     fi
 
 
