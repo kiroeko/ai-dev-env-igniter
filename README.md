@@ -52,6 +52,9 @@ docker run -it -p 80:80 -p 8080:8080 -p 8501:8501 -p 8998:8998 --gpus all --name
 >> git clone https://huggingface.co/jingyaogong/MiniMind2
 >> cd dataset
 >> git clone https://www.modelscope.cn/datasets/gongjy/minimind_dataset.git
+>> mv minimind_dataset/* ./
+>> rm -r minimind_dataset
+>> chmod -R 777 ..
 >> cd ../scripts
 >> nohup streamlit run web_demo.py &
 # 注意：执行上述命令后，如需退出但不关闭容器，请按 Ctrl+P 然后 Ctrl+Q
