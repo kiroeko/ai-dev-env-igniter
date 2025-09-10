@@ -9,7 +9,7 @@
 # 使用方法
 
 ## 对于 Ubuntu 24 实体机用户
-### 提升为 root 用户
+1. 提升为 root 用户
 ```shell
 sudo passwd root
 >> <passwd>
@@ -17,7 +17,7 @@ sudo passwd root
 su root
 >> <root-passwd>
 ```
-### 运行此脚本
+2. 运行此脚本
 ```shell
 apt update
 apt install -y git
