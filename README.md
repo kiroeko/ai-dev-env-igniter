@@ -27,7 +27,7 @@ git clone git@github.com:kiroeko/ai-dev-env-igniter.git
 # 或按需使用 cn 参数：./ai-dev-env-igniter/main/ubuntu24-init.sh cn
 ```
 ## 对于 WSL 用户
-1. 首先确保 Windows 系统运行 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11，且已安装了最新 [Nvidia 显卡驱动](https://www.nvidia.cn/drivers/lookup/)。
+1. 首先确保 Windows 系统运行 Windows 11，且已安装了最新 [Nvidia 显卡驱动](https://www.nvidia.cn/drivers/lookup/)。
 2. 下载[此代码仓库](https://github.com/kiroeko/ai-dev-env-igniter/archive/refs/heads/main.zip)。
 3. 使用 Powershell 运行此代码仓库中的 `wsl/wsl-init.ps1`。
 4. 在打开的 WSL 终端设置好用户信息，并运行此代码仓库中的`main/ubuntu24-init.sh`（如果当前并非 root 用户，会要求输入当前用户的密码）。

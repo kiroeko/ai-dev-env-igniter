@@ -5,16 +5,16 @@
 show_help() {
     sudo echo "$0 [options]"
     sudo echo "options:"
-    sudo echo "                    # Set ubuntu system environment."
-    sudo echo "  cn                # Set apt / pip / docker source to the commonly used mirror source in China."
-    sudo echo "  host              # Also set AI development environment in docker host."
-    sudo echo "  -h help --help    # Show this help info."
+    sudo echo "                        # Set ubuntu system environment."
+    sudo echo "  cn                    # Set apt / pip / docker source to the commonly used mirror source in China."
+    sudo echo "  host                  # Also set AI development environment in docker host."
+    sudo echo "  -h | --help | help    # Show this help info."
     sudo echo ""
     sudo echo "sample:"
-    sudo echo "  $0                # Set ubuntu system environment only."
-    sudo echo "  $0 cn             # Set ubuntu system environment + Set Chinese mirror source."
-    sudo echo "  $0 cn host        # Set ubuntu system environment + Set Chinese mirror source + Also set ai dev env in docker host."
-    sudo echo "  $0 -h             # Show help info."
+    sudo echo "  $0                    # Set ubuntu system environment only."
+    sudo echo "  $0 cn                 # Set ubuntu system environment + Set Chinese mirror source."
+    sudo echo "  $0 cn host            # Set ubuntu system environment + Set Chinese mirror source + Also set ai dev env in docker host."
+    sudo echo "  $0 -h                 # Show help info."
 }
 
 
@@ -190,7 +190,7 @@ main() {
     
     for arg in "$@"; do
         case "${arg}" in
-            "-h"|"help"|"--help")
+            "-h"|"--help"|"help")
                 show_help
                 exit 0
                 ;;
