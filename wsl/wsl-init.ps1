@@ -63,15 +63,48 @@ function InstallEnvForHost {
 
     $arch = (Get-CimInstance Win32_OperatingSystem).OSArchitecture
     $proc = (Get-CimInstance Win32_Processor).AddressWidth
-    if (!($arch -like "*64*" -and $proc -eq 9)) {
+    if (!($arch -like "*64*" -and $proc -eq 64)) {
         Write-Output "Unsupported CPU architecture, Windows CUDA only supports amd64. Installing and configuring environment for Windows machine was canceled."
         return
     }
-
+    
     # Install python
-    Write-Output "Installing Python 3.12..."
+    $isPythonInstallNeeded = $true
+    $pythonVersion = TestCommand -Command "python" -Arguments "--version"
+    $pythonVersionOutput = $pythonVersion.StandardOutput
+    if (!$pythonVersion.HasException -and $pythonVersion.ExitCode -eq 0) {
+        if ($pythonVersionOutput -match '(\d+)\.(\d+)\.') {
+            $major = [int]$matches[1]
+            $minor = [int]$matches[2]
+            if ($major -gt 3 -or ($major -eq 3 -and $minor -ge 9)) {
+                $isPythonInstallNeeded = $false
+            }
+        }
+    }
+
+    if ($isPythonInstallNeeded) {
+        Write-Output "Downloading Python 3.12..."
+        try {
+            $pythonUrl = "https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.exe"
+            $installerPath = "$env:TEMP\python-3.12.9-amd64.exe"
+            Invoke-WebRequest -Uri $pythonUrl -OutFile $installerPath
+            Write-Host "Download Python 3.12 success!" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "Download Python 3.12 failed: $($_.Exception.Message)"
+            exit 10
+        }
+
+        Write-Output "Installing Python..." -ForegroundColor Yellow
+        $installPython = TestCommand -Command "$env:TEMP\python-3.12.9-amd64.exe" -Arguments "/passive InstallAllUsers=1 PrependPath=1 Include_test=0 Include_doc=0"
+        if ($installPython.ExitCode -ne 0) {
+            Write-Error "Installing python failed. Error: $($installPython.StandardError)"
+            exit 11
+        }
+    }
 
     # Install CUDA
+    
 }
 
 
@@ -83,7 +116,7 @@ function Init {
     $wslStatus = TestCommand -Command "wsl" -Arguments "--status"
     if (!$wslStatus.HasException -and $wslStatus.ExitCode -ne 0) {
         Write-Error "Wsl is available, but it does not work properly. Error: $($wslStatus.StandardError)"
-        exit 3;
+        exit 3
     }
 
     if ($wslStatus.HasException) {
@@ -91,7 +124,7 @@ function Init {
         $wslInstall = TestCommand -Command "wsl" -Arguments "--install --inbox --no-distribution"
         if ($wslInstall.ExitCode -ne 0) {
             Write-Error "Installing wsl failed. Error: $($wslInstall.StandardError)"
-            exit 4;
+            exit 4
         }
     }
     
@@ -99,18 +132,18 @@ function Init {
     $wslUpdate = TestCommand -Command "wsl" -Arguments "--update"
     if ($wslUpdate.ExitCode -ne 0) {
         Write-Error "Update wsl failed. Error: $($wslUpdate.StandardError)"
-        exit 5;
+        exit 5
     }
     $wslSetDefaultVersion = TestCommand -Command "wsl" -Arguments "--set-default-version 2"
     if ($wslSetDefaultVersion.ExitCode -ne 0) {
         Write-Error "Update wsl failed. Error: $($wslSetDefaultVersion.StandardError)"
-        exit 6;
+        exit 6
     }
     
     $wslList = TestCommand -Command "wsl" -Arguments "--list --quiet"
     if ($wslList.ExitCode -ne 0) {
         Write-Error "List wsl failed. Error: $($wslList.StandardError)"
-        exit 7;
+        exit 7
     }
 
     $wslLists =$wslList.StandardOutput
@@ -125,14 +158,14 @@ function Init {
         $wslInstall = TestCommand -Command "wsl" -Arguments "--install --distribution Ubuntu-24.04 --web-download"
         if ($wslInstall.ExitCode -ne 0) {
             Write-Error "Installing Ubuntu 24.04 for wsl failed. Error: $($wslInstall.StandardError)"
-            exit 8;
+            exit 8
         }
     }
 
     $wslSetDefault = TestCommand -Command "wsl" -Arguments "--set-default Ubuntu-24.04"
     if ($wslSetDefault.ExitCode -ne 0) {
         Write-Error "Set Ubuntu24.04 as wsl default failed. Error: $($wslSetDefault.StandardError)"
-        exit 9;
+        exit 9
     }
 
     if ($IsForHost) {
