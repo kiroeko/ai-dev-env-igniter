@@ -84,9 +84,9 @@ function InstallEnvForHost {
 
     if ($isPythonInstallNeeded) {
         Write-Output "Downloading Python 3.12..."
+        $installerPath = "$env:TEMP\python-3.12.9-amd64.exe"
         try {
             $pythonUrl = "https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.exe"
-            $installerPath = "$env:TEMP\python-3.12.9-amd64.exe"
             Invoke-WebRequest -Uri $pythonUrl -OutFile $installerPath
             Write-Host "Download Python 3.12 success!" -ForegroundColor Green
         }
@@ -95,27 +95,55 @@ function InstallEnvForHost {
             exit 10
         }
 
-        Write-Output "Installing Python..." -ForegroundColor Yellow
-        $installPython = TestCommand -Command "$env:TEMP\python-3.12.9-amd64.exe" -Arguments "/passive InstallAllUsers=1 PrependPath=1 Include_test=0 Include_doc=0"
+        Write-Host "Installing Python..." -ForegroundColor Yellow
+        $installPython = TestCommand -Command $installerPath -Arguments "/passive InstallAllUsers=1 PrependPath=1 Include_test=0 Include_doc=0"
+        Remove-Item -Path $installerPath -Force
         if ($installPython.ExitCode -ne 0) {
-            Write-Error "Installing python failed. Error: $($installPython.StandardError)"
+            Write-Error "Installing Python failed. Error: $($installPython.StandardError)"
             exit 11
         }
     }
 
     # Install CUDA
     $isCudaInstallNeeded = $true
-    $cudaVersion = TestCommand -Command "nvcc" -Arguments "--version"
-    $cudaVersionOutput = $cudaVersion.StandardOutput
-    if (!$cudaVersion.HasException -and $cudaVersion.ExitCode -eq 0) {
-        if ($cudaVersionOutput -match '(\d+)\.(\d+)\.') {
+    $nvccVersion = TestCommand -Command "nvcc" -Arguments "--version"
+    $nvccVersionOutput = $nvccVersion.StandardOutput
+    if (!$nvccVersion.HasException -and $nvccVersion.ExitCode -eq 0) {
+        if ($nvccVersionOutput -match 'release\s(\d+)\.(\d+)\') {
             $major = [int]$matches[1]
             $minor = [int]$matches[2]
-            if ($major -gt 3 -or ($major -eq 3 -and $minor -ge 9)) {
-                $isPythonInstallNeeded = $false
+            if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 9)) {
+                $isCudaInstallNeeded = $false
             }
         }
     }
+
+    if ($isCudaInstallNeeded) {
+        Write-Output "Downloading CUDA 12.9..."
+        $installerPath = "$env:TEMP\cuda_12.9.1_576.57_windows.exe"
+        try {
+            $cudaUrl = "https://developer.download.nvidia.com/compute/cuda/12.9.1/local_installers/cuda_12.9.1_576.57_windows.exe"
+            Invoke-WebRequest -Uri $cudaUrl -OutFile $installerPath
+            Write-Host "Download CUDA 12.9 success!" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "Download CUDA 12.9 failed: $($_.Exception.Message)"
+            exit 10
+        }
+
+        Write-Host "Installing CUDA..." -ForegroundColor Yellow
+        $installCuda = TestCommand -Command $installerPath
+        Remove-Item -Path $installerPath -Force
+        if ($installCuda.ExitCode -ne 0) {
+            Write-Error "Installing CUDA failed. Error: $($installCuda.StandardError)"
+            exit 11
+        }
+    }
+
+    # Install Pytorch
+    
+
+    Write-Host "Installing and configuring enviorment for Windows machine successed" -ForegroundColor Green
 }
 
 
