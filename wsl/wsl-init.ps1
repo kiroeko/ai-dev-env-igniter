@@ -97,12 +97,11 @@ function InstallEnvForHost {
 
         Write-Host "Installing Python..." -ForegroundColor Yellow
         $installPython = TestCommand -Command $installerPath -Arguments "/passive InstallAllUsers=1 PrependPath=1 Include_test=0 Include_doc=0"
-        Remove-Item -Path $installerPath -Force
         if ($installPython.ExitCode -ne 0) {
-            Write-Error "Installing Python failed. Error: $($installPython.StandardError)"
+            Write-Error "Installing Python failed. Path: $installerPath, Error: $($installPython.StandardError)"
             exit 11
         }
-        
+        Remove-Item -Path $installerPath -Force
         Write-Host "Install Python 3.12 success!" -ForegroundColor Green
     }
 
@@ -111,7 +110,7 @@ function InstallEnvForHost {
     $nvccVersion = TestCommand -Command "nvcc" -Arguments "--version"
     $nvccVersionOutput = $nvccVersion.StandardOutput
     if (!$nvccVersion.HasException -and $nvccVersion.ExitCode -eq 0) {
-        if ($nvccVersionOutput -match 'release\s(\d+)\.(\d+)\') {
+        if ($nvccVersionOutput -match 'release\s(\d+)\.(\d+)') {
             $major = [int]$matches[1]
             $minor = [int]$matches[2]
             if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 9)) {
@@ -121,7 +120,7 @@ function InstallEnvForHost {
     }
 
     if ($isCudaInstallNeeded) {
-        Write-Host "Downloading CUDA 12.9..." -ForegroundColor Yellow
+        # Write-Host "Downloading CUDA 12.9..." -ForegroundColor Yellow
         $installerPath = "$env:TEMP\cuda_12.9.1_576.57_windows.exe"
         try {
             $cudaUrl = "https://developer.download.nvidia.com/compute/cuda/12.9.1/local_installers/cuda_12.9.1_576.57_windows.exe"
@@ -135,11 +134,11 @@ function InstallEnvForHost {
 
         Write-Host "Installing CUDA..." -ForegroundColor Yellow
         $installCuda = TestCommand -Command $installerPath
-        Remove-Item -Path $installerPath -Force
         if ($installCuda.ExitCode -ne 0) {
-            Write-Error "Installing CUDA failed. Error: $($installCuda.StandardError)"
+            Write-Error "Installing CUDA failed. Path: $installerPath, Error: $($installCuda.StandardError)"
             exit 11
         }
+        Remove-Item -Path $installerPath -Force
         Write-Host "Install CUDA 12.9 success!" -ForegroundColor Green
     }
 
