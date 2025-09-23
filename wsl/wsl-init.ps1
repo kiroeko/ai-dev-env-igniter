@@ -83,7 +83,7 @@ function InstallEnvForHost {
     }
 
     if ($isPythonInstallNeeded) {
-        Write-Output "Downloading Python 3.12..."
+        Write-Host "Downloading Python 3.12..." -ForegroundColor Yellow
         $installerPath = "$env:TEMP\python-3.12.9-amd64.exe"
         try {
             $pythonUrl = "https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.exe"
@@ -91,7 +91,7 @@ function InstallEnvForHost {
             Write-Host "Download Python 3.12 success!" -ForegroundColor Green
         }
         catch {
-            Write-Host "Download Python 3.12 failed: $($_.Exception.Message)"
+            Write-Host "Download Python 3.12 failed: $($_.Exception.Message)" -ForegroundColor Red
             exit 10
         }
 
@@ -102,6 +102,8 @@ function InstallEnvForHost {
             Write-Error "Installing Python failed. Error: $($installPython.StandardError)"
             exit 11
         }
+        
+        Write-Host "Install Python 3.12 success!" -ForegroundColor Green
     }
 
     # Install CUDA
@@ -119,7 +121,7 @@ function InstallEnvForHost {
     }
 
     if ($isCudaInstallNeeded) {
-        Write-Output "Downloading CUDA 12.9..."
+        Write-Host "Downloading CUDA 12.9..." -ForegroundColor Yellow
         $installerPath = "$env:TEMP\cuda_12.9.1_576.57_windows.exe"
         try {
             $cudaUrl = "https://developer.download.nvidia.com/compute/cuda/12.9.1/local_installers/cuda_12.9.1_576.57_windows.exe"
@@ -127,7 +129,7 @@ function InstallEnvForHost {
             Write-Host "Download CUDA 12.9 success!" -ForegroundColor Green
         }
         catch {
-            Write-Host "Download CUDA 12.9 failed: $($_.Exception.Message)"
+            Write-Host "Download CUDA 12.9 failed: $($_.Exception.Message)" -ForegroundColor Red
             exit 10
         }
 
@@ -138,12 +140,16 @@ function InstallEnvForHost {
             Write-Error "Installing CUDA failed. Error: $($installCuda.StandardError)"
             exit 11
         }
+        Write-Host "Install CUDA 12.9 success!" -ForegroundColor Green
     }
 
     # Install Pytorch
-    
 
-    Write-Host "Installing and configuring enviorment for Windows machine successed" -ForegroundColor Green
+    #python -c "import torch; print('PyTorch版本:', torch.__version__)"
+    #pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
+
+
+    Write-Host "Installing and configuring enviorment for Windows machine successed." -ForegroundColor Green
 }
 
 
