@@ -104,7 +104,18 @@ function InstallEnvForHost {
     }
 
     # Install CUDA
-    
+    $isCudaInstallNeeded = $true
+    $cudaVersion = TestCommand -Command "nvcc" -Arguments "--version"
+    $cudaVersionOutput = $cudaVersion.StandardOutput
+    if (!$cudaVersion.HasException -and $cudaVersion.ExitCode -eq 0) {
+        if ($cudaVersionOutput -match '(\d+)\.(\d+)\.') {
+            $major = [int]$matches[1]
+            $minor = [int]$matches[2]
+            if ($major -gt 3 -or ($major -eq 3 -and $minor -ge 9)) {
+                $isPythonInstallNeeded = $false
+            }
+        }
+    }
 }
 
 
