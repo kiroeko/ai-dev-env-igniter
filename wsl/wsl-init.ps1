@@ -242,6 +242,12 @@ function Init {
 
 
 # main
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $arguments = "& '" + $myinvocation.mycommand.definition + "' " + $args
+    Start-Process powershell -Verb RunAs -ArgumentList $arguments
+    exit
+}
+
 if ($args.Count -gt 1) {
     Write-Error "Error: Too many arguments (>1)."
     ShowHelp
