@@ -120,7 +120,7 @@ function InstallEnvForHost {
     }
 
     if ($isCudaInstallNeeded) {
-        # Write-Host "Downloading CUDA 12.9..." -ForegroundColor Yellow
+        Write-Host "Downloading CUDA 12.9..." -ForegroundColor Yellow
         $installerPath = "$env:TEMP\cuda_12.9.1_576.57_windows.exe"
         try {
             $cudaUrl = "https://developer.download.nvidia.com/compute/cuda/12.9.1/local_installers/cuda_12.9.1_576.57_windows.exe"
@@ -143,10 +143,29 @@ function InstallEnvForHost {
     }
 
     # Install Pytorch
+    $isPytorchInstallNeeded = $true
+    $pytorchVersion = TestCommand -Command "python" -Arguments "-c ""import torch; print(torch.__version__)"""
+    $pytorchVersionOutput = $pytorchVersion.StandardOutput
+    if (!$pytorchVersion.HasException -and $pytorchVersion.ExitCode -eq 0) {
+        if ($pytorchVersionOutput -match '^(\d+)\.(\d+)\.(\d+)$') {
+            $major = [int]$matches[1]
+            $minor = [int]$matches[2]
+            if ($major -gt 2 -or ($major -eq 2 -and $minor -ge 8)) {
+                $isPytorchInstallNeeded = $false
+            }
+        }
+    }
 
-    #python -c "import torch; print('PyTorch版本:', torch.__version__)"
-    #pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
+    if ($isPytorchInstallNeeded) {
+        Write-Host "Installing Pytorch 2.8..." -ForegroundColor Yellow
+        $installPytorch = TestCommand -Command "pip3" -Arguments "install torch torchvision --index-url https://download.pytorch.org/whl/cu129"
+        if ($installPytorch.HasException -or $installPytorch.ExitCode -ne 0) {
+            Write-Error "Installing Pytorch failed. Error: $($installPytorch.StandardError)"
+            exit 12
+        }
 
+        Write-Host "Install Pytorch 2.8 success!" -ForegroundColor Green
+    }
 
     Write-Host "Installing and configuring enviorment for Windows machine successed." -ForegroundColor Green
 }
