@@ -213,7 +213,7 @@ function Init {
         exit 7
     }
 
-    $wslLists =$wslList.StandardOutput
+    $wslLists = $wslList.StandardOutput
     $wslListArray = $wslLists.Split(@("`r`n", "`r", "`n"), [StringSplitOptions]::RemoveEmptyEntries) | 
                 Where-Object { $_.Trim() -ne "" }
     $isUbuntu2404Found = $false
