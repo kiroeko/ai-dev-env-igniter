@@ -151,7 +151,7 @@ function InstallEnvForHost {
     $pytorchVersion = TestCommand -Command "python" -Arguments "-c ""import torch; print(torch.__version__)"""
     $pytorchVersionOutput = $pytorchVersion.StandardOutput
     if (!$pytorchVersion.HasException -and $pytorchVersion.ExitCode -eq 0) {
-        if ($pytorchVersionOutput -match '^(\d+)\.(\d+)\.(\d+)') {
+        if ($pytorchVersionOutput -match '^(\d+)\.(\d+)\.') {
             $major = [int]$matches[1]
             $minor = [int]$matches[2]
             if ($major -gt 2 -or ($major -eq 2 -and $minor -ge 8)) {
